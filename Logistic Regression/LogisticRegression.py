@@ -18,7 +18,7 @@ iris = datasets.load_iris()
 
 """**Plotting function**"""
 
-def plot_decision_regions(x,y, classifier, resolution = 0.02):
+def plot_decision_regions(x,y, classifier,  test_idx = None, resolution = 0.02):
   from matplotlib.colors import ListedColormap
 
   # Marker generator + color map
@@ -45,6 +45,9 @@ def plot_decision_regions(x,y, classifier, resolution = 0.02):
                 marker = markers[idx],
                 label = c,
                 edgecolor='black')
+    if test_idx:
+      x_test, y_test = x[test_idx, :], y[test_idx]
+      plt.scatter(x_test[:, 0], x_test[:, 1], c ='', edgecolor='black', alpha = 1.0, linewidth=1, marker='o', s =100, label='test set')
   #plt.show()
 
 """**Sigmoid function**"""
@@ -103,6 +106,27 @@ y_train_01_subset = y_train[(y_train == 0) | (y_train == 1)]
 lgrd = LogisticRegressionGD(eta = 0.05, n_iter = 1000, random_state = 1)
 lgrd.fit(x_train_01_subset, y_train_01_subset)
 plot_decision_regions(x_train_01_subset, y_train_01_subset, classifier=lgrd)
+plt.xlabel('petal length [standardized]')
+plt.ylabel('petal width [standardized]')
+plt.legend(loc = 'upper left')
+plt.tight_layout()
+plt.show()
+
+"""**Using** `scikit-learn` **Linear regression model**
+
+"""
+
+from sklearn.linear_model import LogisticRegression
+lr = LogisticRegression(C = 100.0, random_state = 1, solver = 'lbfgs', multi_class = 'ovr')
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+sc.fit(x_train)
+x_train_std = sc.transform(x_train)
+x_test_std = sc.transform(x_test)
+x_combined_std = np.vstack((x_train_std, x_test_std))
+y_combined = np.hstack((y_train, y_test))
+lr.fit(x_train_std, y_train)
+plot_decision_regions(x_combined_std, y_combined, classifier = lr, test_idx = range(105, 150))
 plt.xlabel('petal length [standardized]')
 plt.ylabel('petal width [standardized]')
 plt.legend(loc = 'upper left')
