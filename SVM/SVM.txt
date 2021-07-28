@@ -1,0 +1,1 @@
+Chapter 3 - Machine learning with scikit-learn using SVC model
